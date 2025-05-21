@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2025-05-21 14:02:16",
+    "binary": "C:\\Windows\\System32\\calc.exe",
+    "cpu_time": 0,
+    "memory_max": 0,
+    "execution_time": 2.0140199661254883,
+    "cost": 0.0
+  },
+  {
+    "timestamp": "2025-05-21 14:03:33",
+    "binary": "C:\\Windows\\System32\\calc.exe",
+    "cpu_time": 0,
+    "memory_max": 0,
+    "execution_time": 2.0085208415985107,
+    "cost": 0.0
+  },
+  {
+    "timestamp": "2025-05-21 14:04:01",
+    "binary": "C:\\Windows\\System32\\calc.exe",
+    "cpu_time": 0,
+    "memory_max": 0,
+    "execution_time": 2.011122941970825,
+    "cost": 0.0
+  }
+]
