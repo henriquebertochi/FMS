@@ -9,6 +9,7 @@ import datetime
 from ctypes import wintypes
 import pythoncom
 import win32com.client
+import msvcrt
 # Adicione no início do arquivo (após os imports)
 try:
     import colorama
@@ -342,8 +343,6 @@ class CreditManager:
 
 
 class FMS:
-    """Classe principal do File Monitoring System"""
-
     def __init__(self):
         self.run_binary_results = {}
         self.remaining_cpu_quota = 0
@@ -382,9 +381,14 @@ class FMS:
 
             # Adiciona a verificação da tecla ENTER
             def check_for_enter():
-                input()  # Espera ENTER
-                monitor.stop_monitoring()
-                process.terminate()
+                    while monitor.is_process_running():
+                        if msvcrt.kbhit():
+                            key = msvcrt.getch()
+                            if key == b'\r':  # ENTER
+                                monitor.stop_monitoring()
+                                process.terminate()
+                                break
+                        time.sleep(0.1)
                 
             enter_thread = threading.Thread(target=check_for_enter)
             enter_thread.daemon = True
@@ -484,6 +488,43 @@ class FMS:
         except Exception as e:
             print(f"{RED}Erro executando binário: {str(e)}{RESET}")
             return "ERROR"
+
+    def credit_management_menu(self):
+        """Menu de gerenciamento de créditos (pré-pago ou pós-pago)"""
+        while True:
+            print("\n=== Gerenciar Créditos / Pagamentos ===")
+            if self.payment_mode == "prepaid":
+                print("1. Adicionar créditos")
+                print("2. Ver créditos disponíveis")
+            elif self.payment_mode == "postpaid":
+                print("1. Ver relatório de uso")
+                print("2. Limpar histórico após pagamento")
+            print("0. Voltar")
+
+            option = input("\nEscolha uma opção: ")
+
+            if option == "0":
+                break
+
+            elif option == "1":
+                if self.payment_mode == "prepaid":
+                    try:
+                        amount = float(input("Digite a quantidade de créditos a adicionar: "))
+                        self.credit_manager.add_credits(amount)
+                    except ValueError:
+                        print("Valor inválido.")
+                elif self.payment_mode == "postpaid":
+                    self.credit_manager.show_usage_report()
+
+            elif option == "2":
+                if self.payment_mode == "prepaid":
+                    print(f"Créditos disponíveis: {self.credit_manager.credits:.2f}")
+                elif self.payment_mode == "postpaid":
+                    self.credit_manager.clear_usage_history()
+
+            else:
+                print("Opção inválida.")
+
 
     def setup_payment_mode(self):
         """Configura o modo de pagamento"""
