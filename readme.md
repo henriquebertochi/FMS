@@ -1,94 +1,41 @@
-# File Monitoring System (FMS)
+O FMS é um código em Python para executar e monitorar arquivos binários, controlando o uso de CPU, memória e tempo de execução.
 
-Este programa implementa um sistema de monitoramento de execução de binários com controle de recursos (CPU, memória e timeout) conforme especificado nos requisitos.
+## Recursos Principais
+
+* Execução de binários com limites de recursos (CPU, memória, timeout).
+* Três modos de operação:
+    * **Pré-pago**: Use créditos para pagar pela execução.
+    * **Pós-pago**: Registre o uso para faturamento posterior.
+    * **Tradicional**: Use uma quota total de CPU.
+* Gerenciamento de créditos e relatórios de uso.
+* Interface de linha de comando.
+* Interrupção de processos com a tecla Enter.
 
 ## Requisitos
 
-- Windows (devido ao uso das APIs específicas do Windows)
-- Python 3.6 ou superior
-- Biblioteca psutil
+* Python 3.x
+* Bibliotecas: `psutil`, `colorama` (opcional), `pywin32` (otimizado para Windows).
 
-## Instalação
+## Como Usar
 
-Instale a biblioteca necessária usando pip:
+1.  **Configure o Modo de Operação**:
+    * Ao iniciar, escolha entre Pré-pago (1), Pós-pago (2) ou Tradicional/Quota (3).
+    * **Pré-pago**: Digite um nome de usuário. Adicione créditos se necessário.
+    * **Pós-pago**: Digite um nome de usuário. Os custos serão registrados.
+    * **Tradicional**: Defina uma quota total de CPU.
 
-```
-pip install -r requirements.txt
-```
+2.  **Menu Principal**:
+    * **Executar binário (Opção 1)**:
+        * Forneça o caminho do arquivo.
+        * Defina a quota de CPU para a execução.
+        * Defina o limite de memória (MB, `0` para sem limite).
+        * Defina o timeout (segundos, `0` para sem limite).
+    * **Gerenciar créditos/pagamentos (Opção 2, se aplicável)**:
+        * **Pré-pago**: Adicionar/ver créditos.
+        * **Pós-pago**: Ver relatório de uso/limpar histórico.
+    * **Sair (Opção 0)**.
 
-Ou diretamente:
-
-```
-pip install psutil
-```
-
-## Funcionalidades implementadas
-
-- **Requisitos obrigatórios**:
-  - Lança a execução de qualquer programa executável informado pelo usuário
-  - Solicita ao usuário:
-    - Quota de tempo de CPU para execução
-    - Timeout para execução
-    - Montante máximo de memória para execução
-  - Monitora a execução do processo:
-    - Identifica quando o programa termina
-    - Quantifica o tempo de CPU utilizado (usuário e sistema)
-    - Quantifica o máximo de memória utilizado
-    - Controla o tempo de relógio e mata o processo caso o timeout expire
-  - Funciona em laço, solicitando um novo binário enquanto houver quota disponível
-  - Encerra em caso de limite de CPU ou memória excedido (o timeout não encerra o FMS)
-
-- **Requisitos recomendados**:
-  - Utiliza thread para monitorar constantemente o consumo de CPU e memória (a cada segundo)
-  - Reporta ao usuário o progresso do consumo de CPU e memória
-  - Não desconta da quota execuções que falham
-  - Monitora a árvore completa de processos criados
-
-## Como usar
-
-1. Execute o script `FMS.py`:
-   ```
-   python FMS.py
-   ```
-
-2. Informe a quota total de tempo de CPU (em segundos)
-
-3. Para cada programa a ser executado:
-   - Informe o caminho completo do binário
-   - Defina a quota de CPU para este binário específico
-   - Defina o limite de memória (em MB)
-   - Defina o timeout (em segundos)
-
-4. O sistema monitora a execução e apresenta:
-   - Progresso em tempo real
-   - Relatório após a execução
-   - Encerramento automático se limites forem excedidos
-
-5. Digite 'sair' para encerrar o programa a qualquer momento
-
-## Implementação
-
-O programa utiliza:
-- `psutil`: para monitoramento de recursos do processo
-- `ctypes`: para acessar as APIs do Windows (Sysinfoapi.h e processthreadsapi.h)
-- `threading`: para monitoramento em paralelo
-- `subprocess`: para execução de processos
-
-## Observações
-
-- O tempo de CPU é diferente do tempo de relógio (walltime)
-- O programa monitora tanto o tempo de CPU quanto o tempo real de execução
-- A memória é monitorada em MB
-- O programa é capaz de monitorar toda a árvore de processos criada pelo binário principal
-
-Retorno consistente: A função agora sempre retorna um dos seguintes valores:
-
-"COMPLETED" - Execução concluída normalmente
-
-"TIMEOUT" - Processo foi encerrado por timeout
-
-"ERROR" - Ocorreu um erro durante a execução
-
-"LIMIT_EXCEEDED" - Processo excedeu algum limite (CPU, memória)
-
-"NO_CREDITS" - Modo pré-pago sem créditos suficientes
+3.  **Interromper Processo**: Durante a execução de um binário, você pode pressionar `Enter` para encerrá-lo.
+    * No fim do processo, dependendo do modo escolhido, ele irá gerar um arquivo com as informações utilizadas:
+        * `fms_credits_<username>.json`: Saldo de créditos (modo pré-pago).
+        * `fms_usage_<username>.json`: Log de uso (modo pós-pago).
