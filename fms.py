@@ -1,3 +1,5 @@
+# Integrantes do grupo: Henrique Bertochi, Tiago Pinheiro, Vicenzo Copetti
+
 import os
 import subprocess
 import time
